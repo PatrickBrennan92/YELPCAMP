@@ -2,8 +2,11 @@ const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
 const ejsMate = require("ejs-mate");
+const asyncCatch = require("./utilities/asyncCatch.js");
+const ExpressError = require("./utilities/ExpressError.js");
 const methodOverride = require("method-override");
 const Campground = require("./models/campground.js");
+const { campgroundSchema } = require("./utilities/validationSchemas.js")
 
 const app = express();
 const port = 3000;
@@ -28,58 +31,74 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 
+const validateCampground = (req, res, next) => {
+
+    const { error } = campgroundSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(",");
+        throw new ExpressError(msg, 400)
+    } else {
+        next();
+    }
+}
+
 // routes ------------------------------------------------------------------------
 app.get("/", (req, res) => {
     res.render("home.ejs");
 });
 
-app.get("/campgrounds", async(req, res) => {
+app.get("/campgrounds", asyncCatch(async(req, res) => {
     const campgrounds = await Campground.find({});
     res.render("campgrounds/index.ejs", { campgrounds });
-});
+}));
 
 app.get("/campgrounds/new", (req, res) => {
     res.render("campgrounds/new.ejs");
 });
 
-app.post("/campgrounds", async(req, res, next) => {
-    try {
-        const newCamp = new Campground(req.body.campground);
-        await newCamp.save();
-        res.redirect(`/campgrounds/${newCamp._id}`)
-    } catch (e) {
-        next(e);
-    }
-});
+app.post("/campgrounds", validateCampground, asyncCatch(async(req, res, next) => {
+    // if (!req.body.campground) throw new ExpressError("Ivalid Campground Data", 400);
 
-app.get("/campgrounds/:id", async(req, res) => {
+    const newCamp = new Campground(req.body.campground);
+    await newCamp.save();
+    res.redirect(`/campgrounds/${newCamp._id}`);
+}));
+
+app.get("/campgrounds/:id", asyncCatch(async(req, res) => {
     const { id } = req.params;
     const camp = await Campground.findById(id);
     res.render("campgrounds/show.ejs", { camp });
-});
+}));
 
-app.put("/campgrounds/:id", async(req, res) => {
+app.put("/campgrounds/:id", validateCampground, asyncCatch(async(req, res) => {
     const { id } = req.params;
-    await Campground.findByIdAndUpdate(id, {...req.body.campgrounds })
-    res.redirect(`/campgrounds/${id}`)
-});
+    await Campground.findByIdAndUpdate(id, {...req.body.campgrounds });
+    res.redirect(`/campgrounds/${id}`);
+}));
 
-app.delete("/campgrounds/:id", async(req, res) => {
+app.delete("/campgrounds/:id", asyncCatch(async(req, res) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
-    res.redirect("/campgrounds")
-});
+    res.redirect("/campgrounds");
+}));
 
-app.get("/campgrounds/:id/edit", async(req, res) => {
+app.get("/campgrounds/:id/edit", asyncCatch(async(req, res) => {
     const { id } = req.params;
-    console.log(id)
+    console.log(id);
     const camp = await Campground.findById(id);
-    res.render("campgrounds/edit.ejs", { camp })
+    res.render("campgrounds/edit.ejs", { camp });
+}));
+
+// for any paths that don't exist
+app.all("*", (req, res, next) => {
+    next(new ExpressError("Page not found!", 404));
 });
 
 // Error Handler --------------------------------------------------------------
 app.use((err, req, res, next) => {
-    res.send("Something went wrong!");
+    const { statusCode = 500 } = err;
+    if (!err.message) err.message = "Something went wrong!";
+    res.status(statusCode).render("error.ejs", { err });
 });
 
 
