@@ -2,30 +2,68 @@
     <div class="row">
         <h1 class="text-center">New Campground</h1>
         <div class="col-6 offset-3">
-            <form action="/campgrounds" method="POST">
+            <form class="needs-validation" action="/campgrounds" method="POST" novalidate>
                 <div class="mb-3">
                     <label class="form-label" for="title">Camp Name: </label>
-                    <input class="form-control" type="text" name="campground[title]" id="title">
+                    <input class="form-control" type="text" name="campground[title]" id="title" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="description">Description: </label>
-                    <textarea class="form-control" type="text" name="campground[description]" id="description"></textarea>
+                    <textarea class="form-control" type="text" name="campground[description]" id="description" required></textarea>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="location">Location: </label>
-                    <input class="form-control" type="text" name="campground[location]" id="location">
+                    <input class="form-control" type="text" name="campground[location]" id="location" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
                 <div class=" input-group mb-3">
                     <label class="input-group form-label" for="price">Price: </label>
                     <span class="input-group-text" id="price-label">$</span>
-                    <input class="form-control" type="text" name="campground[price]" id="price" aria-describedby="price-label" placeholder="0.00">
+                    <input class="form-control" type="text" name="campground[price]" id="price" aria-describedby="price-label" placeholder="0.00" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="image">Image URL: </label>
-                    <input class="form-control" type="text" name="campground[image]" id="image">
+                    <input class="form-control" type="text" name="campground[image]" id="image" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
                 <button class="btn btn-success">Add Campground</button>
                 <a class="btn btn-danger" href="/campgrounds">back</a>
             </form>
         </div>
     </div>
+
+    <script>
+        // Example starter JavaScript for disabling form submissions if there are invalid fields
+        (function() {
+            'use strict'
+
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            const forms = document.querySelectorAll('.needs-validation')
+
+            // Loop over them and prevent submission
+            Array.from(forms)
+                .forEach(function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>

@@ -4,27 +4,42 @@
             <h1 class="text-center">Edit
                 <%=camp.title%>
             </h1>
-            <form action="/campgrounds/<%=camp._id%>?_method=PUT" method="POST">
+            <form class="needs-validation" action="/campgrounds/<%=camp._id%>?_method=PUT" method="POST" novalidate>
                 <div class="mb-3">
                     <label class="form-label" for="title">Camp Name: </label>
-                    <input class="form-control" type="text" name="campgrounds[title]" id="title" value="<%=camp.title%>">
+                    <input class="form-control" type="text" name="campgrounds[title]" id="title" value="<%=camp.title%>" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="description">Description: </label>
-                    <textarea class="form-control" type="text" name="campgrounds[description]" id="description"><%=camp.description%></textarea>
+                    <textarea class="form-control" type="text" name="campgrounds[description]" id="description" required><%=camp.description%></textarea>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="location">Location: </label>
-                    <input class="form-control" type="text" name="campgrounds[location]" id="location" value="<%=camp.location%>">
+                    <input class="form-control" type="text" name="campgrounds[location]" id="location" value="<%=camp.location%>" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
                 <div class="input-group mb-3">
                     <label class="input-group form-label" for="price">Price: </label>
                     <span class="input-group-text" id="price-label">$</span>
-                    <input class="form-control" type="text" name="campgrounds[price]" id="price" value="<%=camp.price%>" aria-describedby="price-label">
+                    <input class="form-control" type="text" name="campgrounds[price]" id="price" value="<%=camp.price%>" aria-describedby="price-label" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="image">Image URL: </label>
-                    <input class="form-control" type="text" name="campgrounds[image]" id="image" value="<%=camp.image%>">
+                    <input class="form-control" type="text" name="campgrounds[image]" id="image" value="<%=camp.image%>" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
                 <button class="btn btn-success">Edit</button>
                 <a class="btn btn-danger" href="/campgrounds/<%=camp._id%>">back</a>
@@ -32,3 +47,26 @@
 
         </div>
     </div>
+
+    <script>
+        // JavaScript for disabling form submissions if there are invalid fields
+        (function() {
+            'use strict'
+
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            const forms = document.querySelectorAll('.needs-validation')
+
+            // Loop over them and prevent submission
+            Array.from(forms)
+                .forEach(function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>

@@ -42,10 +42,14 @@ app.get("/campgrounds/new", (req, res) => {
     res.render("campgrounds/new.ejs");
 });
 
-app.post("/campgrounds", async(req, res) => {
-    const newCamp = new Campground(req.body.campground);
-    await newCamp.save();
-    res.redirect(`/campgrounds/${newCamp._id}`)
+app.post("/campgrounds", async(req, res, next) => {
+    try {
+        const newCamp = new Campground(req.body.campground);
+        await newCamp.save();
+        res.redirect(`/campgrounds/${newCamp._id}`)
+    } catch (e) {
+        next(e);
+    }
 });
 
 app.get("/campgrounds/:id", async(req, res) => {
@@ -73,8 +77,13 @@ app.get("/campgrounds/:id/edit", async(req, res) => {
     res.render("campgrounds/edit.ejs", { camp })
 });
 
+// Error Handler --------------------------------------------------------------
+app.use((err, req, res, next) => {
+    res.send("Something went wrong!");
+});
 
-// listener ---------------------------------------------------------------------
+
+// listener -------------------------------------------------------------------
 app.listen(port, () => {
     console.log("Listening on port 3000!");
 });
