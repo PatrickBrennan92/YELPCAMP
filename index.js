@@ -6,7 +6,8 @@ const asyncCatch = require("./utilities/asyncCatch.js");
 const ExpressError = require("./utilities/ExpressError.js");
 const methodOverride = require("method-override");
 const Campground = require("./models/campground.js");
-const { campgroundSchema } = require("./utilities/validationSchemas.js")
+const { campgroundSchema, reviewSchema } = require("./utilities/validationSchemas.js");
+const Review = require("./models/review.js");
 
 const app = express();
 const port = 3000;
@@ -31,12 +32,23 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 
+// validation middleware -----------------------------------------------------------
 const validateCampground = (req, res, next) => {
 
     const { error } = campgroundSchema.validate(req.body);
     if (error) {
         const msg = error.details.map(el => el.message).join(",");
-        throw new ExpressError(msg, 400)
+        throw new ExpressError(msg, 400);
+    } else {
+        next();
+    }
+}
+
+const validateReview = (req, res, next) => {
+    const { error } = reviewSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(",");
+        throw new ExpressError(msg, 400);
     } else {
         next();
     }
@@ -87,6 +99,15 @@ app.get("/campgrounds/:id/edit", asyncCatch(async(req, res) => {
     console.log(id);
     const camp = await Campground.findById(id);
     res.render("campgrounds/edit.ejs", { camp });
+}));
+
+app.post("/campgrounds/:id/review", validateReview, asyncCatch(async(req, res) => {
+    const campground = await Campground.findById(req.params.id);
+    const review = new Review(req.body.review);
+    campground.reviews.push(review);
+    await review.save();
+    await campground.save();
+    res.redirect(`/campgrounds/${campground._id}`)
 }));
 
 // for any paths that don't exist
