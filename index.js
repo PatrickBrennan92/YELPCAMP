@@ -9,6 +9,9 @@ const Campground = require("./models/campground.js");
 const { campgroundSchema, reviewSchema } = require("./utilities/validationSchemas.js");
 const Review = require("./models/review.js");
 
+// required routes -----------------------------------------------------------------
+const campgrounds = require("./routes/campgrounds.js")
+
 const app = express();
 const port = 3000;
 
@@ -33,16 +36,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 
 // validation middleware -----------------------------------------------------------
-const validateCampground = (req, res, next) => {
-
-    const { error } = campgroundSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map(el => el.message).join(",");
-        throw new ExpressError(msg, 400);
-    } else {
-        next();
-    }
-}
 
 const validateReview = (req, res, next) => {
     const { error } = reviewSchema.validate(req.body);
@@ -59,40 +52,8 @@ app.get("/", (req, res) => {
     res.render("home.ejs");
 });
 
-app.get("/campgrounds", asyncCatch(async(req, res) => {
-    const campgrounds = await Campground.find({});
-    res.render("campgrounds/index.ejs", { campgrounds });
-}));
+app.use("/campgrounds", campgrounds);
 
-app.get("/campgrounds/new", (req, res) => {
-    res.render("campgrounds/new.ejs");
-});
-
-app.post("/campgrounds", validateCampground, asyncCatch(async(req, res, next) => {
-    // if (!req.body.campground) throw new ExpressError("Ivalid Campground Data", 400);
-
-    const newCamp = new Campground(req.body.campground);
-    await newCamp.save();
-    res.redirect(`/campgrounds/${newCamp._id}`);
-}));
-
-app.get("/campgrounds/:id", asyncCatch(async(req, res) => {
-    const { id } = req.params;
-    const camp = await Campground.findById(id).populate("reviews");
-    res.render("campgrounds/show.ejs", { camp });
-}));
-
-app.put("/campgrounds/:id", validateCampground, asyncCatch(async(req, res) => {
-    const { id } = req.params;
-    await Campground.findByIdAndUpdate(id, {...req.body.campgrounds });
-    res.redirect(`/campgrounds/${id}`);
-}));
-
-app.delete("/campgrounds/:id", asyncCatch(async(req, res) => {
-    const { id } = req.params;
-    await Campground.findByIdAndDelete(id);
-    res.redirect("/campgrounds");
-}));
 
 app.delete("/campgrounds/:id/review/:revId", asyncCatch(async(req, res) => {
     const { revId } = req.params;
@@ -102,12 +63,7 @@ app.delete("/campgrounds/:id/review/:revId", asyncCatch(async(req, res) => {
     res.redirect(`/campgrounds/${id}`);
 }));
 
-app.get("/campgrounds/:id/edit", asyncCatch(async(req, res) => {
-    const { id } = req.params;
-    console.log(id);
-    const camp = await Campground.findById(id);
-    res.render("campgrounds/edit.ejs", { camp });
-}));
+
 
 app.post("/campgrounds/:id/review", validateReview, asyncCatch(async(req, res) => {
     const campground = await Campground.findById(req.params.id);
@@ -115,7 +71,7 @@ app.post("/campgrounds/:id/review", validateReview, asyncCatch(async(req, res) =
     campground.reviews.push(review);
     await review.save();
     await campground.save();
-    res.redirect(`/campgrounds/${campground._id}`)
+    res.redirect(`/campgrounds/${campground.id}`)
 }));
 
 // for any paths that don't exist
