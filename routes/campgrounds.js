@@ -32,28 +32,33 @@ router.get("/new", (req, res) => {
 });
 
 router.post("/", validateCampground, asyncCatch(async(req, res, next) => {
-    // if (!req.body.campground) throw new ExpressError("Ivalid Campground Data", 400);
-
     const newCamp = new Campground(req.body.campground);
     await newCamp.save();
+    req.flash("success", "Successfully created new campground.");
     res.redirect(`/campgrounds/${newCamp._id}`);
 }));
 
 router.get("/:id", asyncCatch(async(req, res) => {
     const { id } = req.params;
     const camp = await Campground.findById(id).populate("reviews");
+    if (!camp) {
+        req.flash("error", "Campground not found!");
+        return res.redirect("/campgrounds");
+    }
     res.render("campgrounds/show.ejs", { camp });
 }));
 
 router.put("/:id", validateCampground, asyncCatch(async(req, res) => {
     const { id } = req.params;
     await Campground.findByIdAndUpdate(id, {...req.body.campground });
+    req.flash("success", "Successfully edited campground!");
     res.redirect(`/campgrounds/${id}`);
 }));
 
 router.delete("/:id", asyncCatch(async(req, res) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
+    req.flash("success", "Successfully deleted campground!");
     res.redirect("/campgrounds");
 }));
 
