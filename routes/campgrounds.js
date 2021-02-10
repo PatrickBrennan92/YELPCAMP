@@ -20,6 +20,8 @@ const validateCampground = (req, res, next) => {
     }
 }
 
+// routes --------------------------------------------------------------------------
+
 router.get("/", asyncCatch(async(req, res) => {
     const campgrounds = await Campground.find({});
     res.render("campgrounds/index.ejs", { campgrounds });
