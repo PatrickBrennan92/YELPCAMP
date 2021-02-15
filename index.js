@@ -11,8 +11,9 @@ const localStrategy = require("passport-local");
 const User = require("./models/user.js");
 
 // required routes -----------------------------------------------------------------
-const campgrounds = require("./routes/campgrounds.js");
-const reviews = require("./routes/reviews.js");
+const campgroundRoutes = require("./routes/campgrounds.js");
+const reviewRoutes = require("./routes/reviews.js");
+const userRoutes = require("./routes/users.js");
 
 const app = express();
 const port = 3000;
@@ -74,16 +75,9 @@ app.get("/", (req, res) => {
     res.render("home.ejs");
 });
 
-// for testing. to be deleted
-app.get("/fakeUser", async(req, res) => {
-    const user = new User({ email: "paddy@gmail.com", username: "paddy" })
-    const newUser = await User.register(user, "chicken");
-    res.send(newUser);
-})
-
-app.use("/campgrounds", campgrounds);
-
-app.use("/campgrounds/:id/review", reviews);
+app.use("/", userRoutes);
+app.use("/campgrounds", campgroundRoutes);
+app.use("/campgrounds/:id/review", reviewRoutes);
 
 // for any paths that don't exist
 app.all("*", (req, res, next) => {
