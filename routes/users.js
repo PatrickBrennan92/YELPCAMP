@@ -8,13 +8,16 @@ router.get("/register", (req, res) => {
     res.render("users/register.ejs")
 });
 
-router.post("/register", asyncCatch(async(req, res) => {
+router.post("/register", asyncCatch(async(req, res, next) => {
     try {
         const { username, email, password } = req.body;
         const user = new User({ username, email });
         const newUser = await User.register(user, password);
-        req.flash("success", "Welcome to Yelp Camp!");
-        res.redirect("/campgrounds");
+        req.login(newUser, err => {
+            if (err) return next(err);
+            req.flash("success", "Welcome to Yelp Camp!");
+            res.redirect("/campgrounds");
+        });
     } catch (e) {
         req.flash("error", e.message)
         res.redirect("/register")
@@ -27,7 +30,9 @@ router.get("/login", (req, res) => {
 
 router.post("/login", passport.authenticate("local", { failureFlash: true, failureRedirect: "/login" }), (req, res) => {
     req.flash("success", "Welcome Back!");
-    res.redirect("/campgrounds");
+    const redirect = req.session.returnTo || "/campgrounds";
+    delete req.session.returnTo;
+    res.redirect(redirect);
 });
 
 router.get("/logout", (req, res) => {
