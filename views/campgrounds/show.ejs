@@ -7,6 +7,9 @@
                     <h5 class="card-title">
                         <%=camp.title%>
                     </h5>
+                    <p class="muted"><small>Submitted by
+                        <%=camp.author.username%>
+                    </small></p>
                     <p class="card-text">
                         <%=camp.description%>
                     </p>
@@ -17,13 +20,19 @@
                         <%=camp.price%> / night
                     </li>
                 </ul>
+
+
                 <div class="card-body">
                     <a class="btn btn-warning" href="/campgrounds">All Camps</a>
-                    <a class="btn btn-info" href="/campgrounds/<%=camp._id%>/edit">edit</a>
-                    <form style="display: inline;" action="/campgrounds/<%=camp._id%>?_method=DELETE" method="POST">
-                        <button class="btn btn-danger">DELETE</button>
-                    </form>
+                    <%if(currentUser && camp.author.equals(currentUser._id)) {%>
+                        <a class="btn btn-info" href="/campgrounds/<%=camp._id%>/edit">edit</a>
+                        <form style="display: inline;" action="/campgrounds/<%=camp._id%>?_method=DELETE" method="POST">
+                            <button class="btn btn-danger">DELETE</button>
+                            <% }%>
+                        </form>
                 </div>
+
+
             </div>
         </div>
 
