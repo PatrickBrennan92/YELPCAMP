@@ -7,18 +7,16 @@ const campgrounds = require("../controllers/campgrounds.js")
 
 
 // routes --------------------------------------------------------------------------
-
-router.get("/", asyncCatch(campgrounds.index));
+router.route("/")
+    .get(asyncCatch(campgrounds.index))
+    .post(isLoggedIn, validateCampground, asyncCatch(campgrounds.createCampground));
 
 router.get("/new", isLoggedIn, campgrounds.renderNewForm);
 
-router.post("/", isLoggedIn, validateCampground, asyncCatch(campgrounds.createCampground));
-
-router.get("/:id", asyncCatch(campgrounds.showCampgrounds));
-
-router.put("/:id", isLoggedIn, isAuthor, validateCampground, asyncCatch(campgrounds.updateCampground));
-
-router.delete("/:id", isLoggedIn, isAuthor, asyncCatch(campgrounds.deleteCampground));
+router.route("/:id")
+    .get(asyncCatch(campgrounds.showCampgrounds))
+    .put(isLoggedIn, isAuthor, validateCampground, asyncCatch(campgrounds.updateCampground))
+    .delete(isLoggedIn, isAuthor, asyncCatch(campgrounds.deleteCampground));
 
 router.get("/:id/edit", isLoggedIn, isAuthor, asyncCatch(campgrounds.renderEditForm));
 
