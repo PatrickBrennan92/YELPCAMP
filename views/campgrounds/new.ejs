@@ -2,7 +2,7 @@
     <div class="row">
         <h1 class="text-center">New Campground</h1>
         <div class="col-6 offset-3">
-            <form class="needs-validation" action="/campgrounds" method="POST" novalidate>
+            <form class="needs-validation" action="/campgrounds" method="POST" enctype="multipart/form-data" novalidate>
                 <div class="mb-3">
                     <label class="form-label" for="title">Camp Name: </label>
                     <input class="form-control" type="text" name="campground[title]" id="title" required>
@@ -32,13 +32,14 @@
                         Looks good!
                     </div>
                 </div>
-                <div class="mb-3">
+                <input type="file" name="image" id="" multiple>
+                <!-- <div class="mb-3">
                     <label class="form-label" for="image">Image URL: </label>
                     <input class="form-control" type="text" name="campground[image]" id="image" required>
                     <div class="valid-feedback">
                         Looks good!
                     </div>
-                </div>
+                </div> -->
                 <button class="btn btn-success">Add Campground</button>
                 <a class="btn btn-danger" href="/campgrounds">back</a>
             </form>
@@ -46,7 +47,7 @@
     </div>
 
     <script>
-        // Example starter JavaScript for disabling form submissions if there are invalid fields
+        // JavaScript for disabling form submissions if there are invalid fields
         (function() {
             'use strict'
 
