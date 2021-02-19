@@ -4,7 +4,7 @@
             <h1 class="text-center">Edit
                 <%=camp.title%>
             </h1>
-            <form class="needs-validation" action="/campgrounds/<%=camp._id%>?_method=PUT" method="POST" novalidate>
+            <form class="needs-validation" action="/campgrounds/<%=camp._id%>?_method=PUT" method="POST" enctype="multipart/form-data" novalidate>
                 <div class="mb-3">
                     <label class="form-label" for="title">Camp Name: </label>
                     <input class="form-control" type="text" name="campground[title]" id="title" value="<%=camp.title%>" required>
@@ -35,11 +35,21 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="image">Image URL: </label>
-                    <input class="form-control" type="text" name="campground[image]" id="image" value="<%=camp.image%>" required>
-                    <div class="valid-feedback">
-                        Looks good!
+                    <div class="mb-3">
+                        <label for="formFileMultiple" class="form-label">Add more files</label>
+                        <input class="form-control" type="file" id="formFileMultiple" name="image" multiple>
                     </div>
+                </div>
+                <div class="mb-3">
+                    <h4>Images</h4>
+                    <% camp.images.forEach((img, i) => { %>
+
+                        <div class="form-check-inline">
+                            <img src="<%= img.thumbnail %>" class="img-thumbnail" alt="">
+                            <label for="image-<%= i %>">Delete image</label>
+                            <input id="image-<%= i %>" type="checkbox" name="deleteImages[]" value="<%= img.filename %>">
+                        </div>
+                        <% }) %>
                 </div>
                 <button class="btn btn-success">Edit</button>
                 <a class="btn btn-danger" href="/campgrounds/<%=camp._id%>">back</a>
