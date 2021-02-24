@@ -31,7 +31,7 @@ const seedDB = async() => {
     //         location: `${cities[random1000].city}, ${cities[random1000].state}`,
     //         description: "This is where the description of the camp will go!"
     //     });
-    await camp.save();
+    // await camp.save();
 };
 
 seedDB().then(() => {
