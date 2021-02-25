@@ -21,17 +21,25 @@ const randomElement = (array) => array[Math.floor(Math.random() * array.length)]
 // creating some useable data for the database
 const seedDB = async() => {
     await Campground.deleteMany({});
-    // for (let i = 0; i < 50; i++) {
-    //     const random1000 = Math.floor(Math.random() * 1000);
-    //     const camp = new Campground({
-    //         author: "602a45a684f6863cec7caa97",
-    //         title: `${randomElement(descriptors)} ${randomElement(places)}`,
-    //         image: "https://source.unsplash.com/collection/483251",
-    //         price: `${Math.floor(Math.random() * 300)}`,
-    //         location: `${cities[random1000].city}, ${cities[random1000].state}`,
-    //         description: "This is where the description of the camp will go!"
-    //     });
-    // await camp.save();
+    for (let i = 0; i < 50; i++) {
+        const random1000 = Math.floor(Math.random() * 1000);
+        const camp = new Campground({
+            author: "602a45a684f6863cec7caa97",
+            title: `${randomElement(descriptors)} ${randomElement(places)}`,
+            image: "https://source.unsplash.com/collection/483251",
+            geometry: {
+                type: "Point",
+                coordinates: [
+                    cities[random1000].longitude,
+                    cities[random1000].latitude
+                ]
+            },
+            price: `${Math.floor(Math.random() * 300)}`,
+            location: `${cities[random1000].city}, ${cities[random1000].state}`,
+            description: "This is where the description of the camp will go!"
+        });
+        await camp.save();
+    }
 };
 
 seedDB().then(() => {
